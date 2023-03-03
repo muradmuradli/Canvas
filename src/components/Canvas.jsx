@@ -5,13 +5,14 @@ import { Stage, Layer, Line, Text, Image } from "react-konva";
 import { useEffect, useState, useRef } from "react";
 import Konva from "konva";
 import ZoomButtons from "./ZoomButtons";
+import useImage from "use-image";
 
 const Canvas = () => {
   const [scaleBy, setScaleBy] = useState(1.1);
   const [tool, setTool] = React.useState("pen");
   const [lines, setLines] = React.useState([]);
   const isDrawing = React.useRef(false);
-  const [image, setImage] = useState();
+  const [treeImage, setTreeImage] = useImage("/tree.jpg");
   const imageRef = useRef();
   const stageRef = useRef(null);
 
@@ -37,19 +38,19 @@ const Canvas = () => {
     }
   };
 
-  useEffect(() => {
-    const img = new window.Image(1000, 1000);
-    img.crossOrigin = "Anonymous";
-    img.src = "/tree.jpg";
+  // useEffect(() => {
+  //   const img = new window.Image();
+  //   img.crossOrigin = "Anonymous";
+  //   img.src = "/tree.jpg";
 
-    setImage(img);
-  }, []);
+  //   setImage(img);
+  // }, []);
 
   useEffect(() => {
-    if (image) {
+    if (treeImage) {
       imageRef.current.cache();
     }
-  }, [image]);
+  }, [treeImage]);
 
   const handleMouseDown = (e) => {
     isDrawing.current = true;
@@ -93,7 +94,7 @@ const Canvas = () => {
             filters={[Konva.Filters.Pixelate]}
             x={100}
             y={0}
-            image={image}
+            image={treeImage}
             ref={imageRef}
           />
           {lines.map((line, i) => (
