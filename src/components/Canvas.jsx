@@ -38,7 +38,7 @@ const Canvas = () => {
   };
 
   useEffect(() => {
-    const img = new window.Image();
+    const img = new window.Image(1000, 1000);
     img.crossOrigin = "Anonymous";
     img.src = "/tree.jpg";
 
