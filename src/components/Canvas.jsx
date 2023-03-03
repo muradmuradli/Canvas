@@ -1,20 +1,20 @@
 import React from "react";
 import styled from "styled-components";
-// import SampleImg from "/tree.jpg";
-import { Stage, Layer, Line, Text, Image } from "react-konva";
+import { Stage, Layer, Line, Image } from "react-konva";
 import { useEffect, useState, useRef } from "react";
 import Konva from "konva";
 import ZoomButtons from "./ZoomButtons";
-import useImage from "use-image";
 
 const Canvas = () => {
   const [scaleBy, setScaleBy] = useState(1.1);
-  const [tool, setTool] = React.useState("pen");
-  const [lines, setLines] = React.useState([]);
-  const isDrawing = React.useRef(false);
-  const [treeImage, setTreeImage] = useImage("/tree.jpg");
+  const [tool, setTool] = useState("pen");
+  const [lines, setLines] = useState([]);
+  const isDrawing = useRef(false);
+  const [treeImage, setTreeImage] = useState(new window.Image());
   const imageRef = useRef();
-  const stageRef = useRef(null);
+  const stageRef = useRef();
+  const lineRef = useRef();
+  const mouseRef = useRef();
 
   const zoomIn = (e) => {
     e.preventDefault();
@@ -38,13 +38,25 @@ const Canvas = () => {
     }
   };
 
-  // useEffect(() => {
-  //   const img = new window.Image();
-  //   img.crossOrigin = "Anonymous";
-  //   img.src = "/tree.jpg";
+  useEffect(() => {
+    const handleMouseMove = (event) => {
+      mouseRef.current.style.top = event.clientY + "px";
+      mouseRef.current.style.left = event.clientX + "px";
+    };
 
-  //   setImage(img);
-  // }, []);
+    window.addEventListener("mousemove", handleMouseMove);
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+    };
+  }, []);
+
+  useEffect(() => {
+    const img = new window.Image(1000, 1000);
+    img.crossOrigin = "Anonymous";
+    img.src = "/tree.jpg";
+    setTreeImage(img);
+  }, []);
 
   useEffect(() => {
     if (treeImage) {
@@ -65,6 +77,7 @@ const Canvas = () => {
     }
     const stage = e.target.getStage();
     const point = stage.getPointerPosition();
+
     let lastLine = lines[lines.length - 1];
     // add point
     lastLine.points = lastLine.points.concat([point.x, point.y]);
@@ -76,6 +89,8 @@ const Canvas = () => {
 
   const handleMouseUp = () => {
     isDrawing.current = false;
+
+    lineRef.current.cache();
   };
 
   return (
@@ -102,20 +117,22 @@ const Canvas = () => {
               className="line"
               key={i}
               points={line.points}
-              stroke="#df4b26"
-              strokeWidth={30}
+              stroke="#4f8dcf"
+              filters={[Konva.Filters.Pixelate]}
+              strokeWidth={40}
               opacity={0.5}
               tension={0.5}
+              ref={lineRef}
               lineCap="round"
               lineJoin="round"
-              globalCompositeOperation={
-                line.tool === "eraser" ? "destination-out" : "source-over"
-              }
             />
           ))}
         </Layer>
       </Stage>
       <ZoomButtons zoomIn={zoomIn} zoomOut={zoomOut} />
+      <div ref={mouseRef} id="mouse-circle">
+        <img src="/cursor.png" alt="circle" />
+      </div>
     </Container>
   );
 };
@@ -124,9 +141,19 @@ const Container = styled.div`
   flex: 8;
   display: flex;
   background-color: #f3f3f3;
+  cursor: crosshair;
 
-  .line {
-    border: 1px solid black;
+  #mouse-circle {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    margin: -25px 0 0 -25px;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  #mouse-circle img {
+    height: 100%;
   }
 `;
 
