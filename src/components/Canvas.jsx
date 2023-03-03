@@ -11,7 +11,7 @@ const Canvas = () => {
   const [tool, setTool] = React.useState("pen");
   const [lines, setLines] = React.useState([]);
   const isDrawing = React.useRef(false);
-  const [image, setImage] = useState(new window.Image());
+  const [image, setImage] = useState();
   const imageRef = useRef();
   const stageRef = useRef(null);
 
@@ -41,8 +41,7 @@ const Canvas = () => {
     const img = new window.Image();
     img.crossOrigin = "Anonymous";
     img.src = "/tree.jpg";
-    img.height = 1000;
-    img.width = 1000;
+
     setImage(img);
   }, []);
 
