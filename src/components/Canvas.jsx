@@ -48,7 +48,6 @@ const Canvas = () => {
   useEffect(() => {
     if (image) {
       imageRef.current.cache();
-      imageRef.current.getLayer().batchDraw();
     }
   }, [image]);
 
